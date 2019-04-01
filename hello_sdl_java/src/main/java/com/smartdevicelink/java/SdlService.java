@@ -60,13 +60,13 @@ public class SdlService {
     private static final String APP_NAME 				= "Hello Sdl";
     private static final String APP_ID 					= "8678309";
 
-    private static final String ICON_FILENAME 			= "hello_sdl_icon.png";
-    private static final String SDL_IMAGE_FILENAME  	= "sdl_full_image.png";
+    private static final String ICON_FILENAME 			= "sdl_s_green.png";
+    private static final String SDL_IMAGE_FILENAME  	= "sdl.png";
 
     private static final String WELCOME_SHOW 			= "Welcome to HelloSDL";
     private static final String WELCOME_SPEAK 			= "Welcome to Hello S D L";
 
-    private static final String TEST_COMMAND_NAME 		= "Test Command";
+    private static final String TEST_COMMAND_NAME 		= "Subscribe on CloudAppVehicleID";
     private static final int TEST_COMMAND_ID 			= 1;
 
     private static final String IMAGE_DIR =             "assets/images/";
@@ -144,6 +144,8 @@ public class SdlService {
                         sendCommands();
                         performWelcomeSpeak();
                         performWelcomeShow();
+                        subscribeVehicleData();
+                        getCloudAppVehicleID();
                     }
                 }
             });
@@ -162,6 +164,8 @@ public class SdlService {
                     }
                 }
             });
+
+            // ToDo: Add handlers for ON_SYSTEM_REQUEST
 
 
             // Create App Icon, this is set in the SdlManager builder
@@ -222,13 +226,24 @@ public class SdlService {
      */
     private void showTest(){
         sdlManager.getScreenManager().beginTransaction();
-        sdlManager.getScreenManager().setTextField1("Command has been selected");
+        sdlManager.getScreenManager().setTextField1("Cloud application is subscribing on CloudAppVehicleID");
         sdlManager.getScreenManager().setTextField2("");
         sdlManager.getScreenManager().commit(null);
 
         sdlManager.sendRPC(new Speak(TTSChunkFactory.createSimpleTTSChunks(TEST_COMMAND_NAME)));
     }
 
+    private void subscribeVehicleData() {
+        SubscribeVehicleData subscribe = new SubscribeVehicleData();
+        subscribe.setCloudAppVehicleID(true);
+        sdlManager.sendRPC(subscribe);
+    }
+
+    private void getCloudAppVehicleID() {
+        GetVehicleData getCloudAppVehicleID = new GetVehicleData();
+        getCloudAppVehicleID.setCloudAppVehicleID(true);
+        sdlManager.sendRPC(getCloudAppVehicleID);
+    }
 
     public interface SdlServiceCallback{
         void onEnd();

@@ -2,6 +2,7 @@ package com.smartdevicelink.protocol;
 
 import com.smartdevicelink.protocol.enums.MessageType;
 import com.smartdevicelink.protocol.enums.SessionType;
+import com.smartdevicelink.protocol.enums.FunctionID;
 
 public class ProtocolMessage {
 	private byte version = 1;
@@ -147,5 +148,17 @@ public class ProtocolMessage {
 	}
 	public int getPrioirtyCoefficient(){
 		return this.priorityCoefficient;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[functionId: " + FunctionID.getFunctionName(this.getFunctionID()));
+		builder.append(", sessionId: " + this.getSessionID());
+		builder.append(", correlationId: " + this.getCorrID());
+		builder.append(", version: " + this.getVersion());
+		builder.append(", encryption: " + this.getPayloadProtected());
+		builder.append("]: " + new String(this.getData()));
+		return builder.toString();
 	}
 } // end-class

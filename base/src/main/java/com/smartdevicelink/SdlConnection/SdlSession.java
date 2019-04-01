@@ -140,6 +140,7 @@ public class SdlSession implements ISdlProtocol, ISdlConnectionListener, ISecuri
         if (sdlProtocol == null){
             return;
         }
+        Log.i(TAG, "Send: " + msg.toString());
         sdlProtocol.sendMessage(msg);
     }
 
@@ -246,7 +247,7 @@ public class SdlSession implements ISdlProtocol, ISdlConnectionListener, ISecuri
             processControlService(msg);
             return;
         }
-
+        Log.i(TAG, "Received: " + msg.toString());
         this.sessionListener.onProtocolMessageReceived(msg);
     }
 
@@ -418,6 +419,7 @@ public class SdlSession implements ISdlProtocol, ISdlConnectionListener, ISecuri
     }
     @Override
     public void onAuthTokenReceived(String authToken) {
+        Log.i(TAG, "Received authToken: " + authToken);
         this.sessionListener.onAuthTokenReceived(authToken, sessionId);
     }
 
