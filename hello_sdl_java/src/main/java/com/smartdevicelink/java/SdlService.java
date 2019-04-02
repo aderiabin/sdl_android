@@ -55,22 +55,21 @@ import java.util.Vector;
 public class SdlService {
 
 
-    private static final String TAG 					= "SDL Service";
+    private static final String TAG = "SDL Service";
 
-    private static final String APP_NAME 				= "Hello Sdl";
-    private static final String APP_ID 					= "8678309";
+    private static final String APP_NAME = "Hello Sdl";
+    private static final String APP_ID = "8678309";
 
-    private static final String ICON_FILENAME 			= "sdl_s_green.png";
-    private static final String SDL_IMAGE_FILENAME  	= "sdl.png";
+    private static final String ICON_FILENAME = "sdl_s_green.png";
+    private static final String SDL_IMAGE_FILENAME = "sdl.png";
 
-    private static final String WELCOME_SHOW 			= "Welcome to HelloSDL";
-    private static final String WELCOME_SPEAK 			= "Welcome to Hello S D L";
+    private static final String WELCOME_SHOW = "Welcome to HelloSDL";
+    private static final String WELCOME_SPEAK = "Welcome to Hello S D L";
 
-    private static final String TEST_COMMAND_NAME 		= "Subscribe on CloudAppVehicleID";
-    private static final int TEST_COMMAND_ID 			= 1;
+    private static final String TEST_COMMAND_NAME = "Subscribe on CloudAppVehicleID";
+    private static final int TEST_COMMAND_ID = 1;
 
-    private static final String IMAGE_DIR =             "assets/images/";
-
+    private static final String IMAGE_DIR = "assets/images/";
 
 
     // variable to create and call functions of the SyncProxy
@@ -79,16 +78,15 @@ public class SdlService {
     private SdlServiceCallback callback;
 
 
-    public SdlService(BaseTransportConfig config, SdlServiceCallback callback){
+    public SdlService(BaseTransportConfig config, SdlServiceCallback callback) {
         this.callback = callback;
         buildSdlManager(config);
     }
 
 
-
     public void start() {
         DebugTool.logInfo("SdlService start() ");
-        if(sdlManager != null){
+        if (sdlManager != null) {
             sdlManager.start();
         }
     }
@@ -124,7 +122,7 @@ public class SdlService {
                 public void onDestroy(SdlManager sdlManager) {
                     DebugTool.logInfo("SdlManager onDestroy ");
                     SdlService.this.sdlManager = null;
-                    if(SdlService.this.callback != null){
+                    if (SdlService.this.callback != null) {
                         SdlService.this.callback.onEnd();
                     }
                 }
@@ -135,7 +133,7 @@ public class SdlService {
             };
 
 
-            HashMap<FunctionID,OnRPCNotificationListener> notificationListenerHashMap = new HashMap<FunctionID,OnRPCNotificationListener>();
+            HashMap<FunctionID, OnRPCNotificationListener> notificationListenerHashMap = new HashMap<FunctionID, OnRPCNotificationListener>();
             notificationListenerHashMap.put(FunctionID.ON_HMI_STATUS, new OnRPCNotificationListener() {
                 @Override
                 public void onNotified(RPCNotification notification) {
@@ -155,8 +153,8 @@ public class SdlService {
                 public void onNotified(RPCNotification notification) {
                     OnCommand command = (OnCommand) notification;
                     Integer id = command.getCmdID();
-                    if(id != null){
-                        switch(id){
+                    if (id != null) {
+                        switch (id) {
                             case TEST_COMMAND_ID:
                                 showTest();
                                 break;
@@ -165,11 +163,19 @@ public class SdlService {
                 }
             });
 
+            notificationListenerHashMap.put(FunctionID.ON_VEHICLE_DATA, new OnRPCNotificationListener() {
+                @Override
+                public void onNotified(RPCNotification notification) {
+                    OnVehicleData vehicleData = (OnVehicleData) notification;
+                    if (vehicleData.getSpeed() != null) unsubscribeVehicleData();
+                }
+            });
+
             // ToDo: Add handlers for ON_SYSTEM_REQUEST
 
 
             // Create App Icon, this is set in the SdlManager builder
-            SdlArtwork appIcon = new SdlArtwork(ICON_FILENAME, FileType.GRAPHIC_PNG, IMAGE_DIR+"sdl_s_green.png", true);
+            SdlArtwork appIcon = new SdlArtwork(ICON_FILENAME, FileType.GRAPHIC_PNG, IMAGE_DIR + "sdl_s_green.png", true);
 
             // The manager builder sets options for your session
             SdlManager.Builder builder = new SdlManager.Builder(APP_ID, APP_NAME, listener);
@@ -182,9 +188,9 @@ public class SdlService {
     }
 
     /**
-     *  Add commands for the app on SDL.
+     * Add commands for the app on SDL.
      */
-    private void sendCommands(){
+    private void sendCommands() {
         AddCommand command = new AddCommand();
         MenuParams params = new MenuParams();
         params.setMenuName(TEST_COMMAND_NAME);
@@ -197,7 +203,7 @@ public class SdlService {
     /**
      * Will speak a sample welcome message
      */
-    private void performWelcomeSpeak(){
+    private void performWelcomeSpeak() {
         sdlManager.sendRPC(new Speak(TTSChunkFactory.createSimpleTTSChunks(WELCOME_SPEAK)));
     }
 
@@ -210,11 +216,11 @@ public class SdlService {
         sdlManager.getScreenManager().beginTransaction();
         sdlManager.getScreenManager().setTextField1(APP_NAME);
         sdlManager.getScreenManager().setTextField2(WELCOME_SHOW);
-        sdlManager.getScreenManager().setPrimaryGraphic(new SdlArtwork(SDL_IMAGE_FILENAME, FileType.GRAPHIC_PNG, IMAGE_DIR+"sdl.png", true));
+        sdlManager.getScreenManager().setPrimaryGraphic(new SdlArtwork(SDL_IMAGE_FILENAME, FileType.GRAPHIC_PNG, IMAGE_DIR + "sdl.png", true));
         sdlManager.getScreenManager().commit(new CompletionListener() {
             @Override
             public void onComplete(boolean success) {
-                if (success){
+                if (success) {
                     Log.i(TAG, "welcome show successful");
                 }
             }
@@ -224,7 +230,7 @@ public class SdlService {
     /**
      * Will show a sample test message on screen as well as speak a sample test message
      */
-    private void showTest(){
+    private void showTest() {
         sdlManager.getScreenManager().beginTransaction();
         sdlManager.getScreenManager().setTextField1("Cloud application is subscribing on CloudAppVehicleID");
         sdlManager.getScreenManager().setTextField2("");
@@ -236,7 +242,14 @@ public class SdlService {
     private void subscribeVehicleData() {
         SubscribeVehicleData subscribe = new SubscribeVehicleData();
         subscribe.setCloudAppVehicleID(true);
+        subscribe.setSpeed(true);
         sdlManager.sendRPC(subscribe);
+    }
+
+    private void unsubscribeVehicleData() {
+        UnsubscribeVehicleData unsubscribe = new UnsubscribeVehicleData();
+        unsubscribe.setCloudAppVehicleID(true);
+        sdlManager.sendRPC(unsubscribe);
     }
 
     private void getCloudAppVehicleID() {
