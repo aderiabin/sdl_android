@@ -806,17 +806,17 @@ public class UnsubscribeVehicleData extends RPCRequest {
 
 	/**
 	 * Sets cloudAppVehicleID
-	 * @param cloudAppVehicleID a boolean value
+	 * @param cloudAppVehicleIDStatus a boolean value
 	 */
-	public void setCloudAppVehicleID(VehicleDataResult cloudAppVehicleID){
-		setParameters(KEY_CLOUD_APP_VEHICLE_ID, cloudAppVehicleID);
+	public void setCloudAppVehicleID(Boolean cloudAppVehicleIDStatus){
+		setParameters(KEY_CLOUD_APP_VEHICLE_ID, cloudAppVehicleIDStatus);
 	}
 
 	/**
 	 * Gets a boolean value. If true, means the cloudAppVehicleDataID data should be  unsubscribed.
 	 * @return a Boolean value.
 	 */
-	public VehicleDataResult getCloudAppVehicleID(){
-		return (VehicleDataResult) getObject(VehicleDataResult.class, KEY_CLOUD_APP_VEHICLE_ID);
+	public Boolean getCloudAppVehicleID(){
+		return getBoolean(KEY_CLOUD_APP_VEHICLE_ID);
 	}
 }
